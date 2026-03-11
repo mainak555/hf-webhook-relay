@@ -1,0 +1,29 @@
+
+name: Hugging Face Webhook Relay
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - app/*
+
+jobs:
+    deploy:      
+      name: Deploy App
+      runs-on: ubuntu-latest
+      environment: prod
+
+      env:
+        HF_WEBHOOK_SECRET: ${{ secrets.HF_WEBHOOK_SECRET }}
+        HF_TOKEN: ${{ secrets.HUGGING_FACE_API_KEY }}
+        HF_REPO: ${{ vars.HF_REPO }}
+        GH_PAT: ${{secrets.GH_PAT}}
+
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Install dependencies
+          run: pip install --no-cache-dir --upgrade huggingface_hub==0.34.3
+
+        - name: Deploy HF Relay
+          run: python ./deploy-app.py
